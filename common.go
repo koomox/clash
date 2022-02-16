@@ -4,9 +4,7 @@ import (
 	"bytes"
 	"compress/zlib"
 	"encoding/base64"
-	"fmt"
 	"io"
-	"strings"
 )
 
 type Config struct {
