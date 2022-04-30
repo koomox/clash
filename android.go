@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-func ForAndroid(host, port, password string) (b []byte, err error) {
+func ForAndroid(password, host, port string) (b []byte, err error) {
 	if !current.isValid {
 		err = fmt.Errorf("initial failed")
 		return
@@ -22,29 +22,28 @@ func ForAndroid(host, port, password string) (b []byte, err error) {
 	return
 }
 
-func Parser(params string) (host, port, password string, err error) {
-	errBadRequest := fmt.Errorf("bad request")
-	if !strings.HasPrefix(params, "trojan://") { // trojan://password@remote_host:remote_port
-		err = errBadRequest
+func ParseTrojanLink(link string) (password, host, port, tag string, err error) {
+	if strings.ToLower(link[:9]) == "trojan://" { // trojan://password@remote_host:remote_port
+		link = link[9:]
+	} else {
+		err = fmt.Errorf("bad request")
 		return
 	}
-	b := strings.Split(params, "trojan://")
-	if len(b) < 2 {
-		err = errBadRequest
-		return
+	offset := 0
+	for i := 0; i < len(link); i++ {
+		switch link[i] {
+		case '@':
+			password = link[:i]
+			offset = i + 1
+		case ':':
+			host = link[offset:i]
+			offset = i + 1
+		case '#':
+			port = link[offset:i]
+			offset = i + 1
+			tag = link[offset:]
+		}
 	}
-	c := strings.Split(b[1], "@")
-	if len(c) < 2 {
-		err = errBadRequest
-		return
-	}
-	password = c[0]
-	d := strings.Split(c[1], ":")
-	if len(d) < 2 {
-		err = errBadRequest
-		return
-	}
-	host = d[0]
-	port = d[1]
+
 	return
 }
