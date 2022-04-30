@@ -23,7 +23,7 @@ func ForAndroid(password, host, port string) (b []byte, err error) {
 }
 
 func ParseTrojanLink(link string) (password, host, port, tag string, err error) {
-	if strings.ToLower(link[:9]) == "trojan://" { // trojan://password@remote_host:remote_port
+	if strings.ToLower(link[:9]) == "trojan://" {
 		link = link[9:]
 	} else {
 		err = fmt.Errorf("bad request")
@@ -38,6 +38,7 @@ func ParseTrojanLink(link string) (password, host, port, tag string, err error) 
 		case ':':
 			host = link[offset:i]
 			offset = i + 1
+			port = link[offset:]
 		case '#':
 			port = link[offset:i]
 			offset = i + 1
